@@ -1,9 +1,5 @@
 name: Publish and Build
-on:
-  push:
-    tags:
-      - 'v*'   # Trigger only on version tags like v1.0.0
-  pull_request:
+on: [ push, pull_request ]
 
 jobs:
   build:
