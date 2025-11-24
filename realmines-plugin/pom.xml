@@ -113,11 +113,6 @@
             <url>https://repo.codemc.io/repository/maven-snapshots/</url>
         </repository>
         <repository>
-            <id>neziw-repo-releases</id>
-            <name>Reposilite Repository</name>
-            <url>https://repo.neziw.ovh/#/releases/joserodpt/realpermissions-api/</url>
-        </repository>
-        <repository>
             <id>repo</id>
             <url>https://repo.triumphteam.dev/snapshots/</url>
         </repository>
