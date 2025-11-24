@@ -1,5 +1,10 @@
 name: Publish and Build
-on: [ push, pull_request ]
+on:
+  push:
+    tags:
+      - 'v*'   # Trigger only on version tags like v1.0.0
+  pull_request:
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -7,18 +12,49 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 17
+
       - uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
+
       - run: mvn clean package
+
+      # Upload as artifact (optional, for workflow access)
       - uses: actions/upload-artifact@v4
         with:
           name: 'RealMines (Dev Build)'
           path: realmines-plugin/target/realmines*.jar
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')  # Only run for tags like v1.0.0
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create GitHub Release
+        id: gh_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload JAR to Release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.gh_release.outputs.upload_url }}
+          asset_path: realmines-plugin/target/realmines*.jar
+          asset_name: realmines-${{ github.ref_name }}.jar
+          asset_content_type: application/java-archive
