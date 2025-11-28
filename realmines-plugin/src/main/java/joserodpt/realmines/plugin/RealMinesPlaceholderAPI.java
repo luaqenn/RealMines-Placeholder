@@ -162,9 +162,12 @@ public class RealMinesPlaceholderAPI extends PlaceholderExpansion {
             final RMine m = this.plugin.getMineManager().getMine(mine);
             if (m != null) {
                 if (m.getMineTimer().getCountdown() == null) {
-                    return "-1";
+                    return "0:00";
                 }
-                return Integer.toString(m.getMineTimer().getCountdown().getSecondsLeft());
+                int totalSeconds = m.getMineTimer().getCountdown().getSecondsLeft();
+                int minutes = totalSeconds / 60;
+                int seconds = totalSeconds % 60;
+                return String.format("%d:%02d", minutes, seconds);
             } else {
                 return "No mine named: " + mine;
             }
