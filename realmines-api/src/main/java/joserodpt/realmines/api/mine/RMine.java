@@ -826,6 +826,11 @@ public abstract class RMine {
         if (e.isBroken() && this.getMineItems().containsKey(e.getMaterial())) {
             MineItem item = this.getMineItems().get(e.getMaterial());
             if (item != null) {
+                if (item.getBreakActions().stream().allMatch(action -> action.getChance() > 99)) {
+                    item.getBreakActions().forEach(m -> m.execute(e.getPlayer(), e.getBlock().getLocation()));
+                    return;
+                }
+
                 MineAction exec = null;
                 for (MineAction breakAction : item.getBreakActions()) {
                     if (random < breakAction.getChance()) {
